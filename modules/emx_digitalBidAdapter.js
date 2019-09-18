@@ -39,11 +39,11 @@ export const emxAdapter = {
       h: sizes[0][1]
     };
   },
-  formatVideoResponse: (bidResponse, emxBid) => {
+  formatVideoResponse: (bidResponse, emxBid, bidRequest) => {
     bidResponse.vastXml = emxBid.adm;
-    if (!emxBid.renderer && (!emxBid.mediaTypes || !emxBid.mediaTypes.video || !emxBid.mediaTypes.video.context || emxBid.mediaTypes.video.context === 'outstream')) {
+    if (bidRequest.bidRequest && bidRequest.bidRequest.mediaTypes && bidRequest.bidRequest.mediaTypes.video && bidRequest.bidRequest.mediaTypes.video.context === 'outstream') {
       bidResponse.renderer = emxAdapter.createRenderer(bidResponse, {
-        id: emxBid.bidId,
+        id: emxBid.id,
         url: RENDERER_URL
       });
     }
@@ -188,14 +188,14 @@ export const spec = {
 
     return true;
   },
-  buildRequests: function (validBidRequests, bidderRequest) {
+  buildRequests: function (validBidRequests, bidRequest) {
     const emxImps = [];
-    const timeout = bidderRequest.timeout || '';
+    const timeout = bidRequest.timeout || '';
     const timestamp = Date.now();
     const url = location.protocol + '//' + ENDPOINT + ('?t=' + timeout + '&ts=' + timestamp + '&src=pbjs');
     const secure = location.protocol.indexOf('https') > -1 ? 1 : 0;
     const domain = utils.getTopWindowLocation().hostname;
-    const page = bidderRequest.refererInfo.referer;
+    const page = bidRequest.refererInfo.referer;
     const device = emxAdapter.getDevice();
     const ref = emxAdapter.getReferrer();
 
@@ -217,7 +217,7 @@ export const spec = {
     });
 
     let emxData = {
-      id: bidderRequest.auctionId,
+      id: bidRequest.auctionId,
       imp: emxImps,
       device,
       site: {
@@ -236,10 +236,11 @@ export const spec = {
       data: JSON.stringify(emxData),
       options: {
         withCredentials: true
-      }
+      },
+      bidRequest
     };
   },
-  interpretResponse: function (serverResponse) {
+  interpretResponse: function (serverResponse, bidRequest) {
     let emxBidResponses = [];
     let response = serverResponse.body || {};
     if (response.seatbid && response.seatbid.length > 0 && response.seatbid[0].bid) {
@@ -261,7 +262,7 @@ export const spec = {
         };
         if (emxBid.adm && emxBid.adm.indexOf('<?xml version=') > -1) {
           isVideo = true;
-          bidResponse = emxAdapter.formatVideoResponse(bidResponse, Object.assign({}, emxBid));
+          bidResponse = emxAdapter.formatVideoResponse(bidResponse, Object.assign({}, emxBid), bidRequest);
         }
         bidResponse.mediaType = (isVideo ? VIDEO : BANNER);
         emxBidResponses.push(bidResponse);
