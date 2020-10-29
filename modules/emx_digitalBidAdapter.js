@@ -208,6 +208,11 @@ export const spec = {
     const secure = location.protocol.indexOf('https') > -1 ? 1 : 0;
     const device = emxAdapter.getDevice();
     const site = emxAdapter.getSite(bidderRequest.refererInfo);
+    
+    let eids = [
+      ...getUnifiedIdEids(validBidRequests),
+      ...getIdentityLinkEids(validBidRequests)
+    ];
 
     utils._each(validBidRequests, function (bid) {
       let tagid = utils.getBidIdParameter('tagid', bid.params);
@@ -219,6 +224,13 @@ export const spec = {
         tagid,
         secure
       };
+
+      if (eids.length > 0) {
+        data.user = {
+          ext: {eids}
+        };
+      }
+
       let typeSpecifics = isVideo ? { video: emxAdapter.buildVideo(bid) } : { banner: emxAdapter.buildBanner(bid) };
       let bidfloorObj = bidfloor > 0 ? { bidfloor, bidfloorcur: DEFAULT_CUR } : {};
       let emxBid = Object.assign(data, typeSpecifics, bidfloorObj);
@@ -248,6 +260,30 @@ export const spec = {
       },
       bidderRequest
     };
+  },
+  getUnifiedIdEids : function(bidRequests) {
+    return getEids(bidRequests, 'tdid', 'adserver.org', 'TDID');
+  },
+  getIdentityLinkEids : function(bidRequests) {
+    return getEids(bidRequests, 'idl_env', 'liveramp.com', 'idl');
+  },
+  getEids : function(bidRequests, type, source, rtiPartner) {
+    return bidRequests
+      .map(getUserId(type)) // bids -> userIds of a certain type
+      .filter((x) => !!x) // filter out null userIds
+      .map(formatEid(source, rtiPartner)); // userIds -> eid objects
+  },
+  getUserId : function (type) {
+    return (bid) => (bid && bid.userId && bid.userId[type]);
+  },
+  formatEid : function(source, rtiPartner) {
+    return (id) => ({
+      source,
+      uids: [{
+        id,
+        ext: { rtiPartner }
+      }]
+    });
   },
   interpretResponse: function (serverResponse, bidRequest) {
     let emxBidResponses = [];
