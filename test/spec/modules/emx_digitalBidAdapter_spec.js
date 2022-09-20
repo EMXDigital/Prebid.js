@@ -555,9 +555,19 @@ describe('emx_digital Adapter', function () {
           'id': '987654321dcb',
           'price': 0.5,
           'ttl': 300,
-          'w': 300
+          'w': 300,
+          'ext': {
+            'paf': {
+              'content_id': 'paf_content'
+            }
+          }
         }]
-      }]
+      }],
+      'ext': {
+        'paf': {
+          'transmission': {'version': '0.1'}
+        }
+      }
     };
 
     const expectedResponse = [{
@@ -586,7 +596,13 @@ describe('emx_digital Adapter', function () {
       'netRevneue': true,
       'mediaType': 'banner',
       'ad': '<!-- Creative -->',
-      'ttl': 300
+      'ttl': 300,
+      'meta': {
+        'paf': {
+          'transmission': {'version': '0.1'},
+          'content_id': 'paf_content'
+        }
+      }
     }];
 
     it('should properly format bid response', function () {
@@ -711,8 +727,16 @@ describe('emx_digital Adapter', function () {
       const bidResponse = utils.deepClone(serverResponse);
       let result = spec.interpretResponse({body: bidResponse});
       expect(result[0].meta.advertiserDomains).to.deep.equal(expectedResponse[0].meta.advertiserDomains);
-      // case where adomains are not in request
-      expect(result[1].meta).to.not.exist;
+      // case where adomains are not in response
+      expect(result[1].meta.advertiserDomains).to.not.exist;
+    });
+
+    it('returns valid paf data', function () {
+      const bidResponse = utils.deepClone(serverResponse);
+      let result = spec.interpretResponse({body: bidResponse});
+      // case where paf data are not in response
+      expect(result[0].meta.paf).to.not.exist;
+      expect(result[1].meta.paf).to.deep.equal(expectedResponse[1].meta.paf);
     });
   });
 
