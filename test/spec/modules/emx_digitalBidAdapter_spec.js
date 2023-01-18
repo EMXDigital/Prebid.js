@@ -735,5 +735,14 @@ describe('emx_digital Adapter', function () {
       expect(syncs[0].type).to.equal('iframe');
       expect(syncs[0].url).to.contains('gdpr=0');
     });
+
+    it('should pass us_privacy string', function () {
+      let syncs = spec.getUserSyncs({ iframeEnabled: true }, {}, {
+        uspConsent: 'test',
+      });
+      expect(syncs).to.not.be.an('undefined');
+      expect(syncs).to.have.lengthOf(1);
+      expect(syncs[0].type).to.equal('iframe');
+    });
   });
 });

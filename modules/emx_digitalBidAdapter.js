@@ -364,6 +364,11 @@ export const spec = {
           url += `?gdpr_consent=${gdprConsent.consentString}`;
         }
       }
+      if (typeof uspConsent === 'string' && gdprConsent && typeof gdprConsent.consentString === 'string') {
+        url += `&usp=${uspConsent}`;
+      } else {
+        url += `?usp=${uspConsent}`;
+      }
       syncs.push({
         type: 'iframe',
         url: url
