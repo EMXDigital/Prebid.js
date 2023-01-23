@@ -368,7 +368,9 @@ export const spec = {
       if (uspConsent && typeof uspConsent.consentString === 'string') {
         consentParams.push(`usp=${uspConsent.consentString}`);
       }
-      url = url + '?' + consentParams.join('&');
+      if (consentParams.length > 0) {
+        url = url + '?' + consentParams.join('&');
+      }
       syncs.push({
         type: 'iframe',
         url: url
