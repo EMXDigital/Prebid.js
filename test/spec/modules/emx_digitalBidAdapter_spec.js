@@ -734,6 +734,7 @@ describe('emx_digital Adapter', function () {
       expect(syncs).to.have.lengthOf(1);
       expect(syncs[0].type).to.equal('iframe');
       expect(syncs[0].url).to.contains('gdpr=0');
+      expect(syncs[0].url).to.equal('https://biddr.brealtime.com/check.html?gdpr=0&gdpr_consent=test')
     });
 
     it('should pass us_privacy string', function () {
