@@ -737,12 +737,30 @@ describe('emx_digital Adapter', function () {
     });
 
     it('should pass us_privacy string', function () {
-      let syncs = spec.getUserSyncs({ iframeEnabled: true }, {}, {
-        uspConsent: 'test',
+      let syncs = spec.getUserSyncs({ iframeEnabled: true }, {}, {}, {
+        consentString: 'test',
       });
       expect(syncs).to.not.be.an('undefined');
       expect(syncs).to.have.lengthOf(1);
       expect(syncs[0].type).to.equal('iframe');
+      expect(syncs[0].url).to.contains('usp=test');
+    });
+
+    it('should pass us_privacy and gdpr strings', function () {
+      let syncs = spec.getUserSyncs({ iframeEnabled: true }, {},
+        {
+          gdprApplies: true,
+          consentString: 'test'
+        },
+        {
+          consentString: 'test'
+        });
+      expect(syncs).to.not.be.an('undefined');
+      expect(syncs).to.have.lengthOf(1);
+      expect(syncs[0].type).to.equal('iframe');
+      expect(syncs[0].url).to.contains('gdpr=1');
+      expect(syncs[0].url).to.contains('usp=test');
+      expect(syncs[0].url).to.equal('https://biddr.brealtime.com/check.html?gdpr=1&gdpr_consent=test&usp=test')
     });
   });
 });

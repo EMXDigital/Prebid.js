@@ -354,21 +354,21 @@ export const spec = {
   },
   getUserSyncs: function (syncOptions, responses, gdprConsent, uspConsent) {
     const syncs = [];
+    const consentParams = [];
     if (syncOptions.iframeEnabled) {
       let url = 'https://biddr.brealtime.com/check.html';
       if (gdprConsent && typeof gdprConsent.consentString === 'string') {
         // add 'gdpr' only if 'gdprApplies' is defined
         if (typeof gdprConsent.gdprApplies === 'boolean') {
-          url += `?gdpr=${Number(gdprConsent.gdprApplies)}&gdpr_consent=${gdprConsent.consentString}`;
+          consentParams.push(`gdpr=${Number(gdprConsent.gdprApplies)}&gdpr_consent=${gdprConsent.consentString}`);
         } else {
-          url += `?gdpr_consent=${gdprConsent.consentString}`;
+          consentParams.push(`?gdpr_consent=${gdprConsent.consentString}`);
         }
       }
-      if (typeof uspConsent === 'string' && gdprConsent && typeof gdprConsent.consentString === 'string') {
-        url += `&usp=${uspConsent}`;
-      } else {
-        url += `?usp=${uspConsent}`;
+      if (uspConsent && typeof uspConsent.consentString === 'string') {
+        consentParams.push(`usp=${uspConsent.consentString}`);
       }
+      url = url + '?' + consentParams.join('&');
       syncs.push({
         type: 'iframe',
         url: url
