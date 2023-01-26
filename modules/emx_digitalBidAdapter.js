@@ -23,7 +23,8 @@ const DEFAULT_CUR = 'USD';
 
 const EIDS_SUPPORTED = [
   { key: 'idl_env', source: 'liveramp.com', rtiPartner: 'idl', queryParam: 'idl' },
-  { key: 'uid2.id', source: 'uidapi.com', rtiPartner: 'UID2', queryParam: 'uid2' }
+  { key: 'uid2.id', source: 'uidapi.com', rtiPartner: 'UID2', queryParam: 'uid2' },
+  { key: 'oneKeyData', source: 'paf' }
 ];
 
 export const emxAdapter = {
@@ -190,12 +191,13 @@ export const emxAdapter = {
     };
   },
   formatEid(id, source, rtiPartner) {
+    let uid = { id };
+    if (rtiPartner) {
+      uid.ext = { rtiPartner };
+    }
     return {
       source,
-      uids: [{
-        id,
-        ext: { rtiPartner }
-      }]
+      uids: [uid]
     };
   }
 };
@@ -342,9 +344,15 @@ export const spec = {
 
         // support for adomain in prebid 5.0
         if (emxBid.adomain && emxBid.adomain.length) {
-          bidResponse.meta = {
-            advertiserDomains: emxBid.adomain
+          bidResponse.meta = Object.assign({}, bidResponse.meta, { advertiserDomains: emxBid.adomain });
+        }
+
+        if (response.ext && response.ext.paf && response.ext.paf.transmission && emxBid.ext && emxBid.ext.paf && emxBid.ext.paf.content_id) {
+          const pafResponse = {
+            content_id: emxBid.ext.paf.content_id,
+            transmission: response.ext.paf.transmission
           };
+          bidResponse.meta = Object.assign({}, bidResponse.meta, { paf: pafResponse });
         }
 
         emxBidResponses.push(bidResponse);
