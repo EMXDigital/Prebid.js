@@ -15,7 +15,7 @@ import {Renderer} from '../src/Renderer.js';
 import {find, includes} from '../src/polyfill.js';
 import {parseDomain} from '../src/refererDetection.js';
 
-const BIDDER_CODE = 'emx_digital';
+const BIDDER_CODE = 'cadent_aperture_mx';
 const ENDPOINT = 'hb.emxdgt.com';
 const RENDERER_URL = 'https://js.brealtime.com/outstream/1.30.0/bundle.js';
 const ADAPTER_VERSION = '1.5.1';
@@ -137,7 +137,7 @@ export const emxAdapter = {
     try {
       return decodeURIComponent(bidResponseAdm.replace(/%(?![0-9][0-9a-fA-F]+)/g, '%25'));
     } catch (err) {
-      logError('emx_digitalBidAdapter', 'error', err);
+      logError('cadent_aperture_mxBidAdapter', 'error', err);
     }
   },
   getSite: (refInfo) => {
@@ -211,7 +211,7 @@ export const spec = {
     }
 
     if (bid.bidder !== BIDDER_CODE) {
-      logWarn(BIDDER_CODE + ': Must use "emx_digital" as bidder code.');
+      logWarn(BIDDER_CODE + ': Must use "cadent_aperture_mx" as bidder code.');
       return false;
     }
 

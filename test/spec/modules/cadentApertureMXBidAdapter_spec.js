@@ -3,7 +3,7 @@ import { spec } from 'modules/cadentApertureMXBidAdapter.js';
 import * as utils from 'src/utils.js';
 import { newBidder } from 'src/adapters/bidderFactory.js';
 
-describe('emx_digital Adapter', function () {
+describe('Cadent Aperture MX Adapter', function () {
   describe('callBids', function () {
     const adapter = newBidder(spec);
     it('exists and is a function', function () {
@@ -14,7 +14,7 @@ describe('emx_digital Adapter', function () {
   describe('isBidRequestValid', function () {
     describe('banner request validity', function () {
       let bid = {
-        'bidder': 'emx_digital',
+        'bidder': 'cadent_aperture_mx',
         'params': {
           'tagid': '25251'
         },
@@ -33,7 +33,7 @@ describe('emx_digital Adapter', function () {
         'auctionId': '1d1a01234a475'
       };
       let badBid = {
-        'bidder': 'emx_digital',
+        'bidder': 'cadent_aperture_mx',
         'params': {
           'tagid': '25251'
         },
@@ -95,7 +95,7 @@ describe('emx_digital Adapter', function () {
 
     describe('video request validity', function () {
       let bid = {
-        'bidder': 'emx_digital',
+        'bidder': 'cadent_aperture_mx',
         'params': {
           'tagid': '25251',
           'video': {}
@@ -116,7 +116,7 @@ describe('emx_digital Adapter', function () {
         'auctionId': '1d1a01234a475'
       };
       let noInstreamBid = {
-        'bidder': 'emx_digital',
+        'bidder': 'cadent_aperture_mx',
         'params': {
           'tagid': '25251',
           'video': {
@@ -139,7 +139,7 @@ describe('emx_digital Adapter', function () {
       };
 
       let outstreamBid = {
-        'bidder': 'emx_digital',
+        'bidder': 'cadent_aperture_mx',
         'params': {
           'tagid': '25251',
           'video': {}
@@ -168,7 +168,7 @@ describe('emx_digital Adapter', function () {
 
       it('should contain tagid param', function () {
         expect(spec.isBidRequestValid({
-          bidder: 'emx_digital',
+          bidder: 'cadent_aperture_mx',
           params: {},
           mediaTypes: {
             banner: {
@@ -177,7 +177,7 @@ describe('emx_digital Adapter', function () {
           }
         })).to.equal(false);
         expect(spec.isBidRequestValid({
-          bidder: 'emx_digital',
+          bidder: 'cadent_aperture_mx',
           params: {
             tagid: ''
           },
@@ -188,7 +188,7 @@ describe('emx_digital Adapter', function () {
           }
         })).to.equal(false);
         expect(spec.isBidRequestValid({
-          bidder: 'emx_digital',
+          bidder: 'cadent_aperture_mx',
           params: {
             tagid: '123'
           },
@@ -204,7 +204,7 @@ describe('emx_digital Adapter', function () {
 
   describe('buildRequests', function () {
     let bidderRequest = {
-      'bidderCode': 'emx_digital',
+      'bidderCode': 'cadent_aperture_mx',
       'auctionId': 'e19f1eff-8b27-42a6-888d-9674e5a6130c',
       'bidderRequestId': '22edbae3120bf6',
       'timeout': 1500,
@@ -216,7 +216,7 @@ describe('emx_digital Adapter', function () {
         'ref': 'https://referrer.com'
       },
       'bids': [{
-        'bidder': 'emx_digital',
+        'bidder': 'cadent_aperture_mx',
         'params': {
           'tagid': '25251'
         },
@@ -464,7 +464,7 @@ describe('emx_digital Adapter', function () {
 
   describe('interpretResponse', function () {
     let bid = {
-      'bidder': 'emx_digital',
+      'bidder': 'cadent_aperture_mx',
       'params': {
         'tagid': '25251',
         'video': {}
@@ -488,7 +488,7 @@ describe('emx_digital Adapter', function () {
     const bid_outstream = {
       'bidderRequest': {
         'bids': [{
-          'bidder': 'emx_digital',
+          'bidder': 'cadent_aperture_mx',
           'params': {
             'tagid': '25251',
             'video': {}
@@ -508,7 +508,7 @@ describe('emx_digital Adapter', function () {
           'bidderRequestId': '22edbae3120bf6',
           'auctionId': '1d1a01234a475'
         }, {
-          'bidder': 'emx_digital',
+          'bidder': 'cadent_aperture_mx',
           'params': {
             'tagid': '25252',
             'video': {}
