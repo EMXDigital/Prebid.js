@@ -25,6 +25,22 @@ describe('Zeta Ssp Bid Adapter', function () {
     }
   ];
 
+  const schain = {
+    complete: 1,
+    nodes: [
+      {
+        asi: 'asi1',
+        sid: 'sid1',
+        rid: 'rid1'
+      },
+      {
+        asi: 'asi2',
+        sid: 'sid2',
+        rid: 'rid2'
+      }
+    ]
+  };
+
   const params = {
     user: {
       uid: 222,
@@ -35,12 +51,14 @@ describe('Zeta Ssp Bid Adapter', function () {
     },
     sid: 'publisherId',
     shortname: 'test_shortname',
+    tagid: 'test_tag_id',
     site: {
       page: 'testPage'
     },
     app: {
       bundle: 'testBundle'
     },
+    bidfloor: 0.2,
     test: 1
   };
 
@@ -102,6 +120,30 @@ describe('Zeta Ssp Bid Adapter', function () {
       gdprApplies: 1,
       consentString: 'consentString'
     },
+    schain: schain,
+    uspConsent: 'someCCPAString',
+    params: params,
+    userIdAsEids: eids,
+    timeout: 500
+  }];
+
+  const bannerWithFewSizesRequest = [{
+    bidId: 12345,
+    auctionId: 67890,
+    mediaTypes: {
+      banner: {
+        sizes: [[300, 250], [200, 240], [100, 150]],
+      }
+    },
+    refererInfo: {
+      page: 'http://www.zetaglobal.com/page?param=value',
+      domain: 'www.zetaglobal.com',
+    },
+    gdprConsent: {
+      gdprApplies: 1,
+      consentString: 'consentString'
+    },
+    schain: schain,
     uspConsent: 'someCCPAString',
     params: params,
     userIdAsEids: eids,
@@ -118,6 +160,8 @@ describe('Zeta Ssp Bid Adapter', function () {
         mimes: ['video/mp4'],
         minduration: 5,
         maxduration: 30,
+        placement: 2,
+        plcmt: 1,
         protocols: [2, 3]
       }
     },
@@ -307,6 +351,8 @@ describe('Zeta Ssp Bid Adapter', function () {
     expect(payload.imp[0].video.mimes).to.eql(videoRequest[0].mediaTypes.video.mimes);
     expect(payload.imp[0].video.w).to.eql(720);
     expect(payload.imp[0].video.h).to.eql(340);
+    expect(payload.imp[0].video.placement).to.eql(videoRequest[0].mediaTypes.video.placement);
+    expect(payload.imp[0].video.plcmt).to.eql(videoRequest[0].mediaTypes.video.plcmt);
 
     expect(payload.imp[0].banner).to.be.undefined;
   });
@@ -358,5 +404,65 @@ describe('Zeta Ssp Bid Adapter', function () {
     const payload = JSON.parse(request.data);
 
     expect(payload.tmax).to.be.undefined;
+  });
+
+  it('Test provide bidfloor', function () {
+    const request = spec.buildRequests(bannerRequest, bannerRequest[0]);
+    const payload = JSON.parse(request.data);
+
+    expect(payload.imp[0].bidfloor).to.eql(params.bidfloor);
+  });
+
+  it('Timeout should exists and be a function', function () {
+    expect(spec.onTimeout).to.exist.and.to.be.a('function');
+    expect(spec.onTimeout({ timeout: 1000 })).to.be.undefined;
+  });
+
+  it('Test schain provided', function () {
+    const request = spec.buildRequests(bannerRequest, bannerRequest[0]);
+    const payload = JSON.parse(request.data);
+
+    expect(payload.source.ext.schain).to.eql(schain);
+  });
+
+  it('Test tagid provided', function () {
+    const request = spec.buildRequests(bannerRequest, bannerRequest[0]);
+    const payload = JSON.parse(request.data);
+
+    expect(payload.imp[0].tagid).to.eql(params.tagid);
+  });
+
+  it('Test if only one size', function () {
+    const request = spec.buildRequests(bannerRequest, bannerRequest[0]);
+    const payload = JSON.parse(request.data);
+
+    // banner
+    expect(payload.imp[0].banner.w).to.eql(300);
+    expect(payload.imp[0].banner.h).to.eql(250);
+
+    expect(payload.imp[0].banner.format).to.be.undefined;
+  });
+
+  it('Test few sizes provided in format', function () {
+    const request = spec.buildRequests(bannerWithFewSizesRequest, bannerWithFewSizesRequest[0]);
+    const payload = JSON.parse(request.data);
+
+    // banner
+    expect(payload.imp[0].banner.w).to.eql(300);
+    expect(payload.imp[0].banner.h).to.eql(250);
+
+    expect(payload.imp[0].banner.format.length).to.eql(3);
+
+    // format[0]
+    expect(payload.imp[0].banner.format[0].w).to.eql(300);
+    expect(payload.imp[0].banner.format[0].h).to.eql(250);
+
+    // format[1]
+    expect(payload.imp[0].banner.format[1].w).to.eql(200);
+    expect(payload.imp[0].banner.format[1].h).to.eql(240);
+
+    // format[2]
+    expect(payload.imp[0].banner.format[2].w).to.eql(100);
+    expect(payload.imp[0].banner.format[2].h).to.eql(150);
   });
 });
