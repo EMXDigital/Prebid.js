@@ -20,6 +20,9 @@ const ENDPOINT = 'hb.emxdgt.com';
 const RENDERER_URL = 'https://js.brealtime.com/outstream/1.30.0/bundle.js';
 const ADAPTER_VERSION = '1.5.1';
 const DEFAULT_CUR = 'USD';
+const ALIASES = [
+  { code: 'emx_digital', gvlid: 183 },
+];
 
 const EIDS_SUPPORTED = [
   { key: 'idl_env', source: 'liveramp.com', rtiPartner: 'idl', queryParam: 'idl' },
@@ -203,6 +206,7 @@ export const cadentAdapter = {
 export const spec = {
   code: BIDDER_CODE,
   gvlid: 183,
+  alias: ALIASES,
   supportedMediaTypes: [BANNER, VIDEO],
   isBidRequestValid: function (bid) {
     if (!bid || !bid.params) {
