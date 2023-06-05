@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { spec } from 'modules/emx_digitalBidAdapter.js';
+import { spec } from 'modules/cadentApertureMXBidAdapter.js';
 import * as utils from 'src/utils.js';
 import { newBidder } from 'src/adapters/bidderFactory.js';
 
