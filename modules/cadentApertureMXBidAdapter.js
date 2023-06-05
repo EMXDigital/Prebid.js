@@ -26,7 +26,7 @@ const EIDS_SUPPORTED = [
   { key: 'uid2.id', source: 'uidapi.com', rtiPartner: 'UID2', queryParam: 'uid2' }
 ];
 
-export const emxAdapter = {
+export const cadentAdapter = {
   validateSizes: (sizes) => {
     if (!isArray(sizes) || typeof sizes[0] === 'undefined') {
       logWarn(BIDDER_CODE + ': Sizes should be an array');
@@ -40,7 +40,7 @@ export const emxAdapter = {
   buildBanner: (bid) => {
     let sizes = [];
     bid.mediaTypes && bid.mediaTypes.banner && bid.mediaTypes.banner.sizes ? sizes = bid.mediaTypes.banner.sizes : sizes = bid.sizes;
-    if (!emxAdapter.validateSizes(sizes)) {
+    if (!cadentAdapter.validateSizes(sizes)) {
       logWarn(BIDDER_CODE + ': could not detect mediaType banner sizes. Assigning to bid sizes instead');
       sizes = bid.sizes
     }
@@ -60,7 +60,7 @@ export const emxAdapter = {
     if (bidRequest.bidderRequest && bidRequest.bidderRequest.bids && bidRequest.bidderRequest.bids.length > 0) {
       const matchingBid = find(bidRequest.bidderRequest.bids, bid => bidResponse.requestId && bid.bidId && bidResponse.requestId === bid.bidId && bid.mediaTypes && bid.mediaTypes.video && bid.mediaTypes.video.context === 'outstream');
       if (matchingBid) {
-        bidResponse.renderer = emxAdapter.createRenderer(bidResponse, {
+        bidResponse.renderer = cadentAdapter.createRenderer(bidResponse, {
           id: emxBid.id,
           url: RENDERER_URL
         });
@@ -81,7 +81,7 @@ export const emxAdapter = {
       dnt: (navigator.doNotTrack === 'yes' || navigator.doNotTrack === '1' || navigator.msDoNotTrack === '1') ? 1 : 0,
       h: screen.height,
       w: screen.width,
-      devicetype: emxAdapter.isMobile() ? 1 : emxAdapter.isConnectedTV() ? 3 : 2,
+      devicetype: cadentAdapter.isMobile() ? 1 : cadentAdapter.isConnectedTV() ? 3 : 2,
       language: (navigator.language || navigator.browserLanguage || navigator.userLanguage || navigator.systemLanguage),
     };
   },
@@ -114,7 +114,7 @@ export const emxAdapter = {
       loaded: false
     });
     try {
-      renderer.setRender(emxAdapter.outstreamRender);
+      renderer.setRender(cadentAdapter.outstreamRender);
     } catch (err) {
       logWarn('Prebid Error calling setRender on renderer', err);
     }
@@ -131,7 +131,7 @@ export const emxAdapter = {
       videoObj['w'] = bid.mediaTypes.video.playerSize[0];
       videoObj['h'] = bid.mediaTypes.video.playerSize[1];
     }
-    return emxAdapter.cleanProtocols(videoObj);
+    return cadentAdapter.cleanProtocols(videoObj);
   },
   parseResponse: (bidResponseAdm) => {
     try {
@@ -180,13 +180,13 @@ export const emxAdapter = {
   // supporting eids
   getEids(bidRequests) {
     return EIDS_SUPPORTED
-      .map(emxAdapter.getUserId(bidRequests))
+      .map(cadentAdapter.getUserId(bidRequests))
       .filter(x => x);
   },
   getUserId(bidRequests) {
     return ({ key, source, rtiPartner }) => {
       let id = deepAccess(bidRequests, `userId.${key}`);
-      return id ? emxAdapter.formatEid(id, source, rtiPartner) : null;
+      return id ? cadentAdapter.formatEid(id, source, rtiPartner) : null;
     };
   },
   formatEid(id, source, rtiPartner) {
@@ -223,12 +223,12 @@ export const spec = {
     if (bid.mediaTypes && bid.mediaTypes.banner) {
       let sizes;
       bid.mediaTypes.banner.sizes ? sizes = bid.mediaTypes.banner.sizes : sizes = bid.sizes;
-      if (!emxAdapter.validateSizes(sizes)) {
+      if (!cadentAdapter.validateSizes(sizes)) {
         logWarn(BIDDER_CODE + ': Missing sizes in bid');
         return false;
       }
     } else if (bid.mediaTypes && bid.mediaTypes.video) {
-      if (!emxAdapter.checkVideoContext(bid)) {
+      if (!cadentAdapter.checkVideoContext(bid)) {
         logWarn(BIDDER_CODE + ': Missing video context: instream or outstream');
         return false;
       }
@@ -247,8 +247,8 @@ export const spec = {
     const timestamp = Date.now();
     const url = 'https://' + ENDPOINT + ('?t=' + timeout + '&ts=' + timestamp + '&src=pbjs');
     const secure = location.protocol.indexOf('https') > -1 ? 1 : 0;
-    const device = emxAdapter.getDevice();
-    const site = emxAdapter.getSite(bidderRequest.refererInfo);
+    const device = cadentAdapter.getDevice();
+    const site = cadentAdapter.getSite(bidderRequest.refererInfo);
 
     _each(validBidRequests, function (bid) {
       let tagid = getBidIdParameter('tagid', bid.params);
@@ -269,7 +269,7 @@ export const spec = {
       if (gpid) {
         data.ext = {gpid: gpid.toString()};
       }
-      let typeSpecifics = isVideo ? { video: emxAdapter.buildVideo(bid) } : { banner: emxAdapter.buildBanner(bid) };
+      let typeSpecifics = isVideo ? { video: cadentAdapter.buildVideo(bid) } : { banner: cadentAdapter.buildBanner(bid) };
       let bidfloorObj = bidfloor > 0 ? { bidfloor, bidfloorcur: DEFAULT_CUR } : {};
       let emxBid = Object.assign(data, typeSpecifics, bidfloorObj);
       emxImps.push(emxBid);
@@ -284,15 +284,15 @@ export const spec = {
       version: ADAPTER_VERSION
     };
 
-    emxData = emxAdapter.getGdpr(bidderRequest, Object.assign({}, emxData));
-    emxData = emxAdapter.getSupplyChain(bidderRequest, Object.assign({}, emxData));
+    emxData = cadentAdapter.getGdpr(bidderRequest, Object.assign({}, emxData));
+    emxData = cadentAdapter.getSupplyChain(bidderRequest, Object.assign({}, emxData));
     if (bidderRequest && bidderRequest.uspConsent) {
       emxData.us_privacy = bidderRequest.uspConsent;
     }
 
     // adding eid support
     if (bidderRequest.userId) {
-      let eids = emxAdapter.getEids(bidderRequest);
+      let eids = cadentAdapter.getEids(bidderRequest);
       if (eids.length > 0) {
         if (emxData.user && emxData.user.ext) {
           emxData.user.ext.eids = eids;
@@ -321,7 +321,7 @@ export const spec = {
       response.seatbid.forEach(function (emxBid) {
         emxBid = emxBid.bid[0];
         let isVideo = false;
-        let adm = emxAdapter.parseResponse(emxBid.adm) || '';
+        let adm = cadentAdapter.parseResponse(emxBid.adm) || '';
         let bidResponse = {
           requestId: emxBid.id,
           cpm: emxBid.price,
@@ -336,7 +336,7 @@ export const spec = {
         };
         if (emxBid.adm && emxBid.adm.indexOf('<?xml version=') > -1) {
           isVideo = true;
-          bidResponse = emxAdapter.formatVideoResponse(bidResponse, Object.assign({}, emxBid), bidRequest);
+          bidResponse = cadentAdapter.formatVideoResponse(bidResponse, Object.assign({}, emxBid), bidRequest);
         }
         bidResponse.mediaType = (isVideo ? VIDEO : BANNER);
 
