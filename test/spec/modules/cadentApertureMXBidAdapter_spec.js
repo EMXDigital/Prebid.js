@@ -3,7 +3,7 @@ import { spec } from 'modules/cadentApertureMXBidAdapter.js';
 import * as utils from 'src/utils.js';
 import { newBidder } from 'src/adapters/bidderFactory.js';
 
-describe('Cadent Aperture MX Adapter', function () {
+describe('cadent_aperture_mx Adapter', function () {
   describe('callBids', function () {
     const adapter = newBidder(spec);
     it('exists and is a function', function () {
