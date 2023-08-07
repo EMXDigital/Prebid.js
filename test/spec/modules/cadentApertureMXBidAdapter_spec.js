@@ -386,6 +386,21 @@ describe('cadent_aperture_mx Adapter', function () {
       expect(request).to.not.have.property('user');
     });
 
+    it('should add gpp string and applicable sections to request', function() {
+      let gppCompliantBidderRequest = utils.deepClone(bidderRequest);
+      let gppConsentString = 'abcdefgh';
+      // let gppApplicableSections = [8];
+      gppCompliantBidderRequest.gppConsent = {
+        'gppString': gppConsentString,
+        'applicableSections': [8]
+      }
+
+      let request = spec.buildRequests(gppCompliantBidderRequest.bids, gppCompliantBidderRequest);
+      request = JSON.parse(request.data);
+      expect(request.regs.gpp).to.exist.and.to.equal(gppConsentString);
+      expect(request.regs.gpp_sid).to.deep.equal([8]);
+    });
+
     it('should add us privacy info to request', function() {
       const uspBidderRequest = utils.deepClone(bidderRequest);
       let consentString = '1YNN';

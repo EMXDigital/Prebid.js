@@ -170,6 +170,21 @@ export const cadentAdapter = {
 
     return cadentData;
   },
+
+  getGpp: (bidRequest, cadentData) => {
+    if (bidRequest.gppConsent) {
+      if (cadentData.regs) {
+        cadentData.regs.gpp = bidRequest.gppConsent.gppString;
+        cadentData.regs.gpp_sid = bidRequest.gppConsent.applicableSections;
+      } else {
+        cadentData.regs = {
+          'gpp': bidRequest.gppConsent.gppString,
+          'gpp_sid': bidRequest.gppConsent.applicableSections
+        }
+      }
+    }
+    return cadentData;
+  },
   getSupplyChain: (bidderRequest, cadentData) => {
     if (bidderRequest.bids[0] && bidderRequest.bids[0].schain) {
       cadentData.source = {
@@ -290,6 +305,7 @@ export const spec = {
     };
 
     cadentData = cadentAdapter.getGdpr(bidderRequest, Object.assign({}, cadentData));
+    cadentData = cadentAdapter.getGpp(bidderRequest, Object.assign({}, cadentData));
     cadentData = cadentAdapter.getSupplyChain(bidderRequest, Object.assign({}, cadentData));
     if (bidderRequest && bidderRequest.uspConsent) {
       cadentData.us_privacy = bidderRequest.uspConsent;
