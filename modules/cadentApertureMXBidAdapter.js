@@ -179,7 +179,7 @@ export const cadentAdapter = {
         cadentData.regs.gpp_sid = gppSid;
       } else {
         cadentData.regs = {
-          gpp,
+          gpp: gpp,
           gpp_sid: gppSid
         }
       }
