@@ -173,13 +173,14 @@ export const cadentAdapter = {
 
   getGpp: (bidRequest, cadentData) => {
     if (bidRequest.gppConsent) {
+      const {gppString: gpp, applicableSections: gppSid} = bidRequest.gppConsent;
       if (cadentData.regs) {
-        cadentData.regs.gpp = bidRequest.gppConsent.gppString;
-        cadentData.regs.gpp_sid = bidRequest.gppConsent.applicableSections;
+        cadentData.regs.gpp = gpp;
+        cadentData.regs.gpp_sid = gppSid;
       } else {
         cadentData.regs = {
-          'gpp': bidRequest.gppConsent.gppString,
-          'gpp_sid': bidRequest.gppConsent.applicableSections
+          gpp,
+          gpp_sid: gppSid
         }
       }
     }
